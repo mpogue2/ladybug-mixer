@@ -1,2 +1,2 @@
 # ladybug-mixer
-Portable, low-noise audio mixer for square dance callers
+Portable, low-cost audio mixer for square dance callers
