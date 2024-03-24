@@ -1,6 +1,8 @@
 # ladybug-mixer
 Portable, low-cost audio mixer for square dance callers
 
+![Prototype Version 2](https://github.com/mpogue2/ladybug-mixer/assets/6316003/c6d495b3-b948-4e52-81e3-188ed94bfdf8 | width=100)
+
 # Version 2 files
 - SCH = schematic
 - GERBER = PC board layout
