@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "../Test1"
+		},
+		{
+			"name": "BlinkTest",
+			"path": "."
+		},
+		{
+			"name": "PowerTest",
+			"path": "../PowerTest"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"fw_reg_stc8g.h": "c",
+			"stdint.h": "c"
+		}
+	}
+}
