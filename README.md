@@ -35,6 +35,9 @@ The Version 2 prototype is in active use at my weekly club, and it seems to work
 - GERBER = PC board layout
 - BOM = Bill of Materials (specifies which parts to place onto the board)
 - PickAndPlace = specifies where to place parts onto the board
+- .lbrn2 = Lightburn 2 files for the laser-cut top/bottom/back/front
+- .f3d = Fusion file for the side panels
+- .stl = 3D model for the 3D-printed side panels
 
 # Licenses applying to all contents of this repository
 - Hardware = CERN OHL-S (https://ohwr.org/cern_ohl_s_v2.txt)
@@ -42,4 +45,4 @@ The Version 2 prototype is in active use at my weekly club, and it seems to work
 - Documentation = CC BY-SA License (https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt)
 
 # NOTES
-- To keep the schematic symbols looking nice, the schematic uses a small number of parts that have the same PCB footprint as the real parts, but have better symbols.  What gets submitted for PCB fabrication is NOT the schematic, it's the GERBER files, the BOM, and the PickAndPlace file.
+- To keep the schematic symbols looking nice, the schematic uses a small number of parts that have the same PCB footprint as the real parts, but have better symbols.  What gets submitted for PCB fabrication is NOT the schematic, it's the GERBER files, the BOM, and the PickAndPlace file.  Note that the BOM is hand-edited to substitute in the correct parts for assembly.  This was the method suggested by the JLCPCB help desk.
