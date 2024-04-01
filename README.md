@@ -6,7 +6,7 @@ Version 2 prototype:
 
 # Description
 
-The Ladybug LB-102 Mixer is an inexpensive ($75), compact audio mixer design, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone ($80), 2 XLR cables ($10 ea.), and a powered speaker like a Alto TS-408 (2000W peak, $250), a caller can provide high-quality sound for 8-10 squares for about $400. 
+The Ladybug LB-102 Mixer is an inexpensive ($75), compact audio mixer design, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone like a [Sennheiser e845 and cable, $100](https://www.amazon.com/Sennheiser-Cardioid-Handheld-Dynamic-Microphone/dp/B07CVK32VV), a [standard XLR mic cable for low-noise output, $10](https://www.amazon.com/dp/B01JNLTTKS), and a powered speaker like an [Alto TS-408, 2000W peak, $250](https://www.amazon.com/Alto-Professional-TS408-Bluetooth-Loudspeaker/dp/B0BB15J4TZ), a caller can provide high-quality sound for 8-10 squares for less than $450. 
 
 A single 9-volt alkaline battery provides power for months or years of dances, and the Ladybug mixer’s compact size makes it easy to carry.
 The entire Ladybug Mixer design is available under an Open Source License, allowing anybody to modify the design to fit their specific needs.
