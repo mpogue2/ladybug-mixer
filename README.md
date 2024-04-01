@@ -2,16 +2,19 @@
 Portable, low-cost audio mixer for square dance callers
 
 Version 2 prototype:
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/6316003/316338628-c6d495b3-b948-4e52-81e3-188ed94bfdf8.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240324%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240324T200714Z&X-Amz-Expires=300&X-Amz-Signature=e15b8aaa5b1080501e38886ad3338c179a74f2bf7f6469c5f90276d2f5b8936e&X-Amz-SignedHeaders=host&actor_id=6316003&key_id=0&repo_id=769083190" width="324">
+<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/d039de7adba558213b8dbf10dc7b3b2c49956114/V2/pics/PrototypeEnclosure_V2.jpg" width="500">
 
 # Description
 
-The Ladybug LB-102 Mixer is an inexpensive ($50), compact audio mixer design, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone ($80), 2 XLR cables ($10 ea.), and a powered speaker like a Alto TS-408 (2000W peak, $250), a caller can provide high-quality sound for 8-10 squares for about $400. 
+The Ladybug LB-102 Mixer is an inexpensive ($75), compact audio mixer design, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone ($80), 2 XLR cables ($10 ea.), and a powered speaker like a Alto TS-408 (2000W peak, $250), a caller can provide high-quality sound for 8-10 squares for about $400. 
 
-A single 9 volt battery provides power for months or years of dances, and the Ladybug mixer’s compact size makes it easy to carry.
+A single 9-volt alkaline battery provides power for months or years of dances, and the Ladybug mixer’s compact size makes it easy to carry.
 The entire Ladybug Mixer design is available under an Open Source License, allowing anybody to modify the design to fit their specific needs.
 
-The Version 2 prototype is in active use at my weekly club, and it seems to work great!
+The Version 2 prototype (seen in the picture above) is in active use at my weekly club, and it seems to work great!
+The Version 3 prototype will use a high-quality powder-coated or anodized aluminum case, with 3D-printed or wood side panels.  
+While this will slightly increase the cost and weight, the V3 case is much more sturdy and solid than the V2 case.
+I expect that V3 kits will also be available, allowing anybody to make their own custom case.  Let the creativity begin!
 
 # Specs
 - 2 Music Inputs (1/8” stereo inputs)
@@ -21,9 +24,9 @@ The Version 2 prototype is in active use at my weekly club, and it seems to work
 - Separate Music (L) and Voice (R) out (1/8” stereo jack)
 	- Music-only for a monitor speaker, or use Voice-only for hearing assist
 - Uses a single 9V battery
-	- Amazon Basics Alkaline ($1.50): 150 hours (est.)
-	- Tencent Lithium ($7.00): 300 hours (est.)
-	- USB-rechargeable Lithium ($7.50): 100 hours per charge (est.)
+	- Amazon Basics Alkaline ($1.50 ea. @ AMZN): 150 hours
+	- Tencent Lithium ($7.00 ea. @ AMZN): 300 hours (est.)
+	- USB-rechargeable Lithium ($7.50 ea. @ AMZN): 90 hours per charge
 - Low noise: -80dBfs
 - Wide Bandwidth: Music 20Hz-20KHz, Voice 50Hz-20KHz
 - Small size: 6.9”W x 2.5”H x 3.75”D (175 x 65 x 95 mm) 
