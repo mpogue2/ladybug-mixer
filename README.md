@@ -12,14 +12,14 @@ A single 9-volt alkaline battery provides power for months or years of dances, a
 The entire Ladybug Mixer design is available under an Open Source License, allowing anybody to modify the design to fit their specific needs.
 
 The Version 2 prototype (seen in the picture above) is in active use at my weekly club, and it seems to work great!
-The Version 3 prototype will use a high-quality powder-coated or anodized aluminum case, with 3D-printed or wood side panels.  
-While this will slightly increase the cost and weight, the V3 case is much more sturdy and solid than the V2 case.
-I expect that V3 kits will also be available, allowing anybody to make their own custom case.  Let the creativity begin!
+The Version 3 prototype will use a high-quality powder-coated or anodized aluminum case, with 3D-printed or wood side panels. While this will slightly increase the cost and weight, the V3 case is much more sturdy and solid than the V2 case. 
+
+I expect that V3 kits will also be available, allowing anybody to design and build their own custom case.  Let the creativity begin!
 
 # Specs
 - 2 Music Inputs (1/8” stereo inputs)
-- 2 Combo Mic Inputs (Lo-Z XLR or Hi-Z Hilton™-compatible 1/4“ plug) 
-- Remote Volume Control Input (20KΩ Hilton™-compatible 1/8” plug)
+- 2 Combo Mic Inputs (Lo-Z XLR or Hi-Z [Hilton™-compatible](https://www.hiltonaudio.com/store/c3/Microphone_Cables.html) 1/4“ plug) 
+- Remote Volume Control Input (20KΩ [Hilton™-compatible](https://www.hiltonaudio.com/store/c3/Microphone_Cables.html) 1/8” plug)
 - Low-noise Balanced Output (XLR)
 - Separate Music (L) and Voice (R) out (1/8” stereo jack)
 	- Music-only for a monitor speaker, or use Voice-only for hearing assist
