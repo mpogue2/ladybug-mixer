@@ -42,6 +42,7 @@ The Version 3 prototype (in progress) will use a high-quality powder-coated or a
 - .lbrn2 = Lightburn 2 files for the laser-cut top/bottom/back/front
 - .f3d = Fusion file for the side panels
 - .stl = 3D model for the 3D-printed side panels
+- .asc/.asy/.pdf = simulation files for LTspice
 
 # Licenses applying to all contents of this repository
 - Hardware = CERN OHL-S (https://ohwr.org/cern_ohl_s_v2.txt)
