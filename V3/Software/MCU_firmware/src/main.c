@@ -119,11 +119,25 @@ inline void serviceBatteryMonitorAndLED() {
     // battery voltage = 0 - 12vdc, divider = 20Kohm/67Kohm = 0.3
     //   so, battery voltage 12v maps to (12 * 0.3)/5 * 255 => 184
     //   so, battery voltage  9v maps to ( 9 * 0.3)/5 * 255 => 138
+
     //   so, battery voltage  7v maps to ( 7 * 0.3)/5 * 255 => 107
+    //   so, battery voltage  6v maps to ( 6 * 0.3)/5 * 255 =>  91
+    
     //   so, battery voltage  4.6v maps to ( 4.6 * 0.3)/5 * 255 => 70 ( I get 70!) <-- USB Stick case
 
-    // 130 ==> 8.5V = HIGH WATER MARK = LED ON
-    // 100 ==> 6.5V = LOW WATER MARK = LED OFF 90%/ON10%
+    // Here's our design choice:
+    // 107 ==> 7.0V = HIGH WATER MARK = LED ON (below this, light starts flashing)
+    //  91 ==> 6.0V = LOW WATER MARK = LED OFF 90%/ON 10%
+
+    // actually measured on the Mixer V2.2 board: flashing starts at 7.2V (which is fine,
+    //   there's always a little uncertainty in the ADC measurement)
+    //
+    // Measurements predict that once flashing begins, 
+    //   the AMZN Alkaline will die in about 40 hours
+    //   the Tencent Lithium will die in about 18 hours
+    // As battery exhaustion gets closer, the LED will be on less and less.
+    //
+    // NOTE: the rechargeable USB lithium batteries will die without any warning!
 
     // // DEBUG DEBUG DEBUG JUMPER ************
     // if (!jumperJ1_IN) {
@@ -144,14 +158,23 @@ inline void serviceBatteryMonitorAndLED() {
     // LED ----------------------
     // counter goes from slot 0 - 9 over 2 seconds (200ms per slot)
     int lastSlot; // slot (0-9) which is last ON slot, others are OFF
-    if (result < 100) {
+    if (result < 91) {
         lastSlot = 0;  // this is as low as we can go, LED is never fully OFF
                        // but, LED dims and MCU stops working at Battery = 3.0VDC
-    } else if (result >= 130) {
+    } else if (result > 108) {
         lastSlot = 10; // always ON
     } else {
-        // 100 - 129 => 0 - 29 => 0 - 9
-        lastSlot = (result - 100)/3; // integer division
+        // result = 91 to 108 maps to => 0 - 17 maps to => lastSlot = 1 to 9
+        // 0/1 = 1
+        // 2/3 = 2
+        // 4/5 = 3
+        // 6/7 = 4
+        // 8/9 = 5
+        // 10/11 = 6
+        // 12/13 = 7
+        // 14/15 = 8 // flashing starts here at 91+15 = 106 => 7.0 volts
+        // 16/17 = 9 // still fully ON
+        lastSlot = ((result - 91) >> 1) + 1; // fast integer division by 2
     }
 
     // example: if lastSlot is 8, turn OFF if we're in slot 9.
