@@ -14,6 +14,10 @@ The Ladybug LB-102 Mixer is an inexpensive ($75) compact audio mixer, focused on
 A single 9-volt alkaline battery provides power for months (or years!) of dances, and the Ladybug mixer’s compact size makes it easy to carry.
 The entire Ladybug Mixer design is available under an Open Source License, allowing anybody to modify the design to fit their specific needs.
 
+> NOTE: This is a "mixer", and not a "mixer/amplifier".  A Hilton(TM) MA-220 is both a mixer and an amplifier, so it will be able
+to send 220W of power to UN-powered speakers.  The Ladybug mixer is designed to send a "line-level" signal to speakers that are "powered",
+that is, the speaker has the amplifier built-in.  There are many popular "powered speakers" available nowadays, like the [Kustom PA-50](https://www.musiciansfriend.com/pro-audio/kustom-pa-pa50-personal-pa-system) (50 watts peak), the [Alto TS-408](https://www.sweetwater.com/store/detail/TS408--alto-ts408-2000-watt-8-inch-powered-speaker) (2000 watts peak), the [Bose L1 column speaker](https://www.bestbuy.com/site/bose-l1-pro8-portable-line-array-system-black) (300 watts peak), and many others.
+
 The Version 3 prototype (in progress now) uses a high-quality aluminum case (brushed, painted, powder-coated, or anodized), with 3D-printed or wood (e.g. walnut or ebonized ash) side panels. I expect that V3 kits will also be available, allowing anybody to design and build their own custom case.  **Let the creativity begin!**
 
 # Specs
