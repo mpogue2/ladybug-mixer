@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightBurnProject AppVersion="1.5.01" FormatVersion="1" MaterialHeight="0" MirrorX="False" MirrorY="False">
+    <Thumbnail Source="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"/>
+    <VariableText>
+        <Start Value="0"/>
+        <End Value="999"/>
+        <Current Value="0"/>
+        <Increment Value="1"/>
+        <AutoAdvance Value="0"/>
+    </VariableText>
+    <UIPrefs>
+        <Optimize_ByLayer Value="0"/>
+        <Optimize_ByGroup Value="-1"/>
+        <Optimize_ByPriority Value="1"/>
+        <Optimize_WhichDirection Value="0"/>
+        <Optimize_InnerToOuter Value="1"/>
+        <Optimize_ByDirection Value="0"/>
+        <Optimize_ReduceTravel Value="1"/>
+        <Optimize_HideBacklash Value="0"/>
+        <Optimize_ReduceDirChanges Value="0"/>
+        <Optimize_ChooseCorners Value="0"/>
+        <Optimize_AllowReverse Value="1"/>
+        <Optimize_RemoveOverlaps Value="0"/>
+        <Optimize_OptimalEntryPoint Value="1"/>
+        <Optimize_OverlapDist Value="0.025"/>
+    </UIPrefs>
+    <CutSetting type="Cut">
+        <index Value="0"/>
+        <name Value=""/>
+        <LinkPath Value="Birch Plywood/3.0000/small squares"/>
+        <maxPower Value="100"/>
+        <maxPower2 Value="20"/>
+        <speed Value="7"/>
+        <numPasses Value="2"/>
+        <priority Value="0"/>
+        <tabCount Value="1"/>
+        <tabCountMax Value="1"/>
+    </CutSetting>
+    <Shape Type="Path" CutIndex="0" VertID="53">
+        <XForm>1.0425463 0 0 1.0750356 -68.95649 152.50366</XForm>
+        <VertList>V208.77394 -65.246109c0x208.77394c0y-62.351479c1x1V203.52942 -60.001408c0x1c1x206.42433c1y-60.001408V76.470757 -60.001408c0x73.576164c0y-60.001408c1x1V71.226089 -65.246109c0x1c1x71.226089c1y-62.351479V71.226089 -134.7538c0x71.226089c0y-137.64882c1x1V76.470757 -139.99876c0x1c1x73.576164c1y-139.99876V203.52942 -139.99876c0x206.42433c0y-139.99876c1x1V208.77394 -134.7538c0x1c1x208.77394c1y-137.64882</VertList>
+        <PrimList>B0 1L1 2B2 3L3 4B4 5L5 6B6 7L7 0</PrimList>
+    </Shape>
+    <Notes ShowOnLoad="0" Notes=""/>
+</LightBurnProject>
