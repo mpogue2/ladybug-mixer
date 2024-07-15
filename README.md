@@ -40,8 +40,8 @@ The Version 3 mixer (shown above) uses a high-quality aluminum case (powder-coat
 	- Use Music-only for a monitor speaker, or use Voice-only for hearing assist
 - Uses a single 9V battery
 	- Amazon Basics Alkaline ($1.50 ea. @ AMZN): about 170 hours
-	- Tencent Lithium ($7.00 ea. @ AMZN): about 300 hours
-	- USB-rechargeable Lithium ($7.50 ea. @ AMZN): about 95 hours per charge
+	- Tenergy Lithium ($7.00 ea. @ AMZN): about 300 hours
+	- USB-rechargeable Lithium ($7.50 ea. @ AMZN): about 100 hours per charge
 - White front-panel LED indicates power ON and battery level (flashes when low)
 - Low noise: -80dBfs
 - Wide 3dB Bandwidth: Music 20Hz-20KHz, Voice 50Hz-20KHz
