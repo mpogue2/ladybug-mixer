@@ -1,5 +1,5 @@
 // +-----------------------------------------------+
-// | BLINKTEST: Firmware for Mixer Board V2.2      |
+// | BLINKTEST: Firmware for Mixer Board V2.4      |
 // |                                               |
 // | Copyright (c) 2024, Michael Pogue             |
 // | License: GPL V3                               |
@@ -14,9 +14,12 @@
 // GLOBALS =============================
 int LEDCounter = 0;
 
+uint8_t firmwareMajorVersion = 1; // NOTE: Increments infrequently
+uint8_t firmwareMinorVersion = 2; // NOTE: Increments every new version
+
 uint8_t jumperADC = 0;
-bool    jumperJ1_IN = false;
-bool    jumperJ2_IN = false;
+bool    jumperJ1_IN = false; // if IN, then REVERSE DIRECTION on Remote Volume Ctrl
+bool    jumperJ2_IN = false; // unassigned right now
 
 uint8_t res = 0;          // attenuation result
 uint8_t previousRes = 0;  // previous attenuation result
@@ -41,6 +44,9 @@ void initJumperRead() {
     // one-time read of the jumper ADC value, which tells us which
     //   of J1/J2 are in/out.  After read at powerup time, 
     //   we don't need to access ADC1 anymore.
+
+    // NOTE: IF THE STC PROGRAMMER IS CONNECTED, THE ADC READ WILL
+    //  ALWAYS BE HIGH, AND BOTH JUMPERS WILL APPEAR TO BE IN.
 
     // init ADC for JUMPER READ, P3.1/ADC1 -----
     GPIO_P3_SetMode(GPIO_Pin_1, GPIO_Mode_Input_HIP);  // Set ADC1(GPIO P3.1) HIP
@@ -102,6 +108,22 @@ void initBatteryMonitorAndLED() {
     ADC_SetClockPrescaler(0x01);    // ADC Clock = SYSCLK / 2 / (1+1) = SYSCLK / 4
     ADC_SetResultAlignmentLeft();   // Left alignment, high 8-bit in ADC_RES
     ADC_SetPowerState(HAL_State_ON); // Turn on ADC power
+}
+
+void showFirmwareVersion() {
+    // Flash the LED "firmwareMinorVersion" number of times
+    //  to indicate which version we are running...
+    // Right now, we're NOT going to flash for firmwareMajorVersion (that's
+    //   for future expansion)
+    SYS_Delay(400); // wait 1/2 sec (in total) for everything to settle
+    for (uint8_t i = 0; i < firmwareMinorVersion; i++) {
+        // blink
+        SYS_Delay(100);
+        TURN_LED_ON()
+        SYS_Delay(100);
+        TURN_LED_OFF()
+    }
+    SYS_Delay(500); // wait 1/2 sec (in total) for everything to settle
 }
 
 inline void serviceBatteryMonitorAndLED() {
@@ -364,47 +386,115 @@ void serviceRemoteVolumeControl() {
 
     // At this point, we know what the remote volume control is set to.
     // "RVCval" at this point will be:
-    //    full CCW = 0xD3 (increase vol for RH people)
-    //    full CW  = 0x00 (mute for RH people)
     //
-    // Most right-handed users will push the pot CCW to increase volume.
-    // Left-handed users might push the pot CW to increase volume.
-    // We could use one of the jumpers to set the direction of the pot.
-    // For example, if jumper was IN, full CCW = max volume, and
-    //   if jumper is OUT, full CCW = min volume.
-    // 
+    //    open (no RVOL) = 0xFF
+    //    full CCW = 0xD3
+    //    full CW  = 0x00
+    //
+    // Most right-handed users will turn the pot CW to increase volume.
+    // Some users (perhaps left-handed) might prefer to push the pot CCW to increase volume.
+    //
+    // Jumper J1 (read at power up time) selects between the two:
+    //
+    //             J1 IN          J1 OUT
+    //             left-handed    right-handed
+    //           +--------------+--------------+
+    //   Pot CW  | VOL DOWN     | VOL UP       |
+    //   Pot CCW | VOL UP       | VOL DOWN     |
+    //           +--------------+--------------+
+    //
     // We could use the other jumper to decide whether the min volume is ZERO (e.g.
     //   in place of the MUTE function that some Hilton cables have), or the min
     //   volume should be say 20% of the max volume (which I have heard some
-    //   callers prefer).
+    //   callers prefer).  For the moment, J2 is currently UNASSIGNED.
     //
-    // TODO: Mapping between the current value of "result" and what we should send
-    //   to the LM1971 attenuator should be done here.
+
+    if (RVCval > 0xE0) {
+        // no Remote Volume Control at all, so attenuation is 0dB
+        res = 0;
+    } else {
+        // we have a Remote Volume Control plugged in
+
+        // RVCval range = {0, 0xD3}
+        uint16_t top = (RVCval << 8) - RVCval; // (RVCval * 255)
+        uint16_t bot = (255 - RVCval);         // (255 - RVCval)
+        uint16_t linearPotVal = top/bot;  // range: {0, 1020}
+            // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
+
+        if (linearPotVal > 1020) {
+            linearPotVal = 1020; // cap this, just in case
+        }
+
+        if (jumperJ1_IN) {
+            // ***** J1 IN = LEFT-HANDED or "REVERSED" VOL CTRL DIRECTION
+        } else {
+            // ***** J1 OUT = RIGHT-HANDED or "NORMAL" VOL CTRL DIRECTION
+            linearPotVal = 1020 - linearPotVal; // 1020 - 0
+        }
+
+// RANGE: 0 - 1020
+#define LOWVAL 32
+#define DIVIDER 15
+#define HIGHVAL (LOWVAL + DIVIDER * 64)
+
+        if (linearPotVal < LOWVAL) {
+            // lowest ~6% on the pot
+            res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
+        } else if (linearPotVal > HIGHVAL) {
+            // highest ~5% on the pot
+            res = 0;   // MAX VOL (0dB attenuation)
+        } else {
+            // linearPotVal range now 61 to 959 = 898 steps = ~64*14
+            // (linearPotVal - 61) = 0 to 898
+            // (linearPotVal - 61)/14 = 0 to 64
+            // 64 - (linearPotVal - 61)/14 = 64 to 0
+            res = 64 - (linearPotVal - LOWVAL)/DIVIDER; // 64dB to 0dB
+            // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
+        }
+
+        // // OLD CODE -------
+        // if (RVCval < 15) {
+        //     res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
+        // } else if (RVCval >= 0xD0) {
+        //     // max ADC is 0xD3 = 211
+        //     // guard band is 0xD0 = 208
+        //     res = 0;   // MAX VOL (0dB attenuation)
+        // } else {
+        //     // RVCval range now 15 to 207 = 192 steps = ~64*3
+        //     // (RVCval - 15) = 0 to 192
+        //     // (RVCval - 15)/3 = 0 to 64
+        //     // 64 - (RVCval - 15)/3 = 64 to 0
+        //     res = 64 - (RVCval - 15)/3; // 64dB to 0dB
+        //     // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
+        // }
+    }
 
 // #ifdef DEBUG_OUTPUT
-//     // PRINT IT -----
-//     UART1_TxHex(result & 0xFF); // print out the remote volume control value
-//     UART1_TxString(",");
+//     // PRINT DETECTED JUMPER VALUES -----
+//     UART1_TxString("\nJUMPER ADC: ");
+//     UART1_TxHex(jumperADC & 0xFF);
+//     UART1_TxString(", JUMPER J1: ");
+//     if (jumperJ1_IN) {
+//         UART1_TxString("IN");
+//     } else {
+//         UART1_TxString("OUT");
+//     }
+//     UART1_TxString(", JUMPER J2: ");
+//     if (jumperJ2_IN) {
+//         UART1_TxString("IN");
+//     } else {
+//         UART1_TxString("OUT");
+//     }
+//     UART1_TxString("\n");
 // #endif
 
-    // range is 0x00 - 0xD3, which is 0 - 211
-    // let's assume that it's 0 - 0xD0, which is 0 - 208
-    // guard bands at top (MAX VOL) and bottom (MUTE) of range, of (208 - 180)/2 = 14
-    // 
-    if (RVCval < 15) {
-        res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
-    } else if (RVCval >= 0xD0) {
-        // max ADC is 0xD3 = 211
-        // guard band is 0xD0 = 208
-        res = 0;   // MAX VOL (0dB attenuation)
-    } else {
-        // RVCval range now 15 to 207 = 192 steps = ~64*3
-        // (RVCval - 15) = 0 to 192
-        // (RVCval - 15)/3 = 0 to 64
-        // 64 - (RVCval - 15)/3 = 64 to 0
-        res = 64 - (RVCval - 15)/3; // 64dB to 0dB
-        // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
-    }
+#ifdef DEBUG_OUTPUT
+    // PRINT IT -----
+    UART1_TxHex(RVCval & 0xFF); // print out the remote volume control value
+    UART1_TxString(",");
+    UART1_TxHex(res & 0xFF); // print out the attenuation
+    UART1_TxString("; ");
+#endif
 
     // step it up or down in increments of 1 dB to avoid zipper effect
     if (previousRes < res) {
@@ -495,6 +585,8 @@ void main()
     initRemoteVolumeControl();    
     initBatteryMonitorAndLED();
     initSleepControl();
+
+    showFirmwareVersion();
 
 #ifdef DEBUG_OUTPUT
     initUART();
