@@ -15,7 +15,7 @@
 int LEDCounter = 0;
 
 uint8_t firmwareMajorVersion = 1; // NOTE: Increments infrequently
-uint8_t firmwareMinorVersion = 2; // NOTE: Increments every new version
+uint8_t firmwareMinorVersion = 1; // NOTE: Increments every new version
 
 uint8_t jumperADC = 0;
 bool    jumperJ1_IN = false; // if IN, then REVERSE DIRECTION on Remote Volume Ctrl
@@ -25,7 +25,8 @@ uint8_t res = 0;          // attenuation result
 uint8_t previousRes = 0;  // previous attenuation result
 
 // SLEEPY: minimize power, but doesn't allow automatic Upload from programmer @ CTL-OPT-U time
-#define SLEEPY
+// NOTE: Sleepy currently messes up the ADC, so turning it OFF for now
+//#define SLEEPY 1
 
 // DEBUG_OUTPUT: enable UART, uses power and cpu cycles, but easier to debug
 //  On Mac, use SerialTools set to usbserial-110 (or similar), 115200/8/N/1.
@@ -356,6 +357,7 @@ void setAttenuation(uint8_t attenInDB) {
 // --------------------------------------------------------
 void initRemoteVolumeControl() {
     GPIO_P3_SetMode(GPIO_Pin_3, GPIO_Mode_Input_HIP);  // Set ADC3(GPIO P3.3) High-impedance InPut
+    GPIO_SetPullUp(GPIO_Port_3, GPIO_Pin_3, HAL_State_OFF);    // ensure NO PULLUP RESISTOR
     GPIO_P3_SetMode(GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2, GPIO_Mode_Output_PP); // VOL_* are Push-Pull outputs
 
     PIN_ATTEN_LOAD = 1; // LOAD
@@ -384,6 +386,12 @@ void serviceRemoteVolumeControl() {
     ADC_ClearInterrupt();
     uint8_t RVCval = ADC_RES;
 
+#ifdef DEBUG_OUTPUT
+    // PRINT IT -----
+    UART1_TxHex(RVCval); // print out the remote volume control value
+    UART1_TxString(",");
+#endif    
+
     // At this point, we know what the remote volume control is set to.
     // "RVCval" at this point will be:
     //
@@ -410,47 +418,64 @@ void serviceRemoteVolumeControl() {
     //
 
     if (RVCval > 0xE0) {
-        // no Remote Volume Control at all, so attenuation is 0dB
+        // no Remote Volume Control at all, so result attenuation (res) is 0dB
         res = 0;
     } else {
         // we have a Remote Volume Control plugged in
 
-        // RVCval range = {0, 0xD3}
+        // RVCval range = {0, 133 or so (depends on tolerance of pot)}
         uint16_t top = (RVCval << 8) - RVCval; // (RVCval * 255)
         uint16_t bot = (255 - RVCval);         // (255 - RVCval)
-        uint16_t linearPotVal = top/bot;  // range: {0, 1020}
+        uint16_t linearPotVal = top/bot;  // range: {0, 256}
             // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
 
-        if (linearPotVal > 1020) {
-            linearPotVal = 1020; // cap this, just in case
+        if (linearPotVal > 255) {
+            linearPotVal = 255; // cap this, just in case
         }
 
         if (jumperJ1_IN) {
             // ***** J1 IN = LEFT-HANDED or "REVERSED" VOL CTRL DIRECTION
         } else {
             // ***** J1 OUT = RIGHT-HANDED or "NORMAL" VOL CTRL DIRECTION
-            linearPotVal = 1020 - linearPotVal; // 1020 - 0
+            linearPotVal = 255 - linearPotVal; // 255 - 0
         }
 
-// RANGE: 0 - 1020
-#define LOWVAL 32
-#define DIVIDER 15
-#define HIGHVAL (LOWVAL + DIVIDER * 64)
+// NO SLEEPY RANGE: 0 - 133
 
-        if (linearPotVal < LOWVAL) {
-            // lowest ~6% on the pot
-            res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
-        } else if (linearPotVal > HIGHVAL) {
-            // highest ~5% on the pot
-            res = 0;   // MAX VOL (0dB attenuation)
-        } else {
-            // linearPotVal range now 61 to 959 = 898 steps = ~64*14
-            // (linearPotVal - 61) = 0 to 898
-            // (linearPotVal - 61)/14 = 0 to 64
-            // 64 - (linearPotVal - 61)/14 = 64 to 0
-            res = 64 - (linearPotVal - LOWVAL)/DIVIDER; // 64dB to 0dB
-            // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
-        }
+    uint16_t q1 = linearPotVal/3;
+    if (q1 >= 80) {
+        // don't allow attenuations of less than 0
+        q1 = 80;
+    }
+
+    res = 80 - q1;
+    if (res > 64) {
+        // don't allow attenuations of more than 64dB
+        res = 64;
+    }
+
+    // RESULTING ATTENUATION = res, range: 0 - 64
+
+// // RANGE: 0 - 255
+// #define LOWVAL 4
+// #define DIVIDER 4
+// // #define HIGHVAL (LOWVAL + DIVIDER * 64)
+// #define HIGHVAL 251
+
+//         if (linearPotVal < LOWVAL) {
+//             // lowest ~6% on the pot
+//             res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
+//         } else if (linearPotVal > HIGHVAL) {
+//             // highest ~5% on the pot
+//             res = 0;   // MAX VOL (0dB attenuation)
+//         } else {
+//             // linearPotVal range now 61 to 959 = 898 steps = ~64*14
+//             // (linearPotVal - 61) = 0 to 898
+//             // (linearPotVal - 61)/14 = 0 to 64
+//             // 64 - (linearPotVal - 61)/14 = 64 to 0
+//             res = 64 - (linearPotVal - LOWVAL)/DIVIDER; // 64dB to 0dB
+//             // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
+//         }
 
         // // OLD CODE -------
         // if (RVCval < 15) {
@@ -490,10 +515,8 @@ void serviceRemoteVolumeControl() {
 
 #ifdef DEBUG_OUTPUT
     // PRINT IT -----
-    UART1_TxHex(RVCval & 0xFF); // print out the remote volume control value
-    UART1_TxString(",");
-    UART1_TxHex(res & 0xFF); // print out the attenuation
-    UART1_TxString("; ");
+    UART1_TxHex(res & 0xFF); // print out the attenuation in dB
+    UART1_TxString("\n");
 #endif
 
     // step it up or down in increments of 1 dB to avoid zipper effect
@@ -560,8 +583,8 @@ void initSleepControl() {
 inline void sleepUntilTimeToWakeup() {
 #ifdef SLEEPY
     // GET READY TO SLEEP AGAIN -----
-    P3M1 &= ~0xFF; // all pins on P3 go to sleep right now, since no REMOTE VOL yet
-    P3M0 &= ~0xFF;
+    P3M1 &= ~0x7F; // all pins on P3 go to sleep right now, except ADC:P3.3
+    P3M0 &= ~0x7F;
     P3 |= 0xFF;
 
     P5M1 &= ~0xCF; // all pins on P5 go to sleep except LED:P5.5, BATTMON: P5.4
@@ -570,7 +593,7 @@ inline void sleepUntilTimeToWakeup() {
 
     enterPowerDownMode();
 #else        
-    SYS_Delay(200); // 5X/sec
+    SYS_Delay(50); // 20X/sec
 #endif        
 }
 
@@ -586,6 +609,11 @@ void main()
     initBatteryMonitorAndLED();
     initSleepControl();
 
+    // before we get going, service these once
+    serviceRemoteVolumeControl();  // service once to set volume
+    serviceBatteryMonitorAndLED(); // service once to set LED
+
+    // this takes a while...
     showFirmwareVersion();
 
 #ifdef DEBUG_OUTPUT
