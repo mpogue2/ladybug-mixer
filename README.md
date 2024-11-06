@@ -45,7 +45,7 @@ The Version 3 mixer (shown above) uses a high-quality aluminum case (powder-coat
 - White front-panel LED indicates power ON and battery level (flashes when low)
 - Low noise: -80dBfs
 - Wide 3dB Bandwidth: Music 20Hz-20KHz, Voice 50Hz-20KHz
-- Small size: 6.9”W x 2.5”H x 3.75”D (175 x 65 x 95 mm) 
+- Small size: 6.2”W x 2.75”H x 3.8”D (157 x 70 x 97 mm)
 - Light weight (with Alkaline battery): 12.5oz (355g)
 - Open Source Hardware, Software, and Mechanical Design (industry-standard open source licenses)
 
