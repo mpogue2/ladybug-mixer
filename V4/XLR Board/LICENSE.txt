@@ -2,7 +2,7 @@ Ladybug Mixer licenses
 ----------------------
 
 The Ladybug mixer devices described in this repository are licensed
-under the following publically-available licenses:
+under the following publicly-available licenses:
 
 	HARDWARE: CERN Open Hardware Licence Version 2 - Strongly Reciprocal
 	SOFTWARE: GNU GENERAL PUBLIC LICENSE Version 3
