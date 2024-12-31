@@ -15,7 +15,7 @@
 int LEDCounter = 0;
 
 uint8_t firmwareMajorVersion = 1; // NOTE: Increments infrequently
-uint8_t firmwareMinorVersion = 1; // NOTE: Increments every new version
+uint8_t firmwareMinorVersion = 2; // NOTE: Increments every new version
 
 uint8_t jumperADC = 0;
 bool    jumperJ1_IN = false; // if IN, then REVERSE DIRECTION on Remote Volume Ctrl
@@ -66,25 +66,33 @@ void initJumperRead() {
     ADC_ClearInterrupt();
     jumperADC = ADC_RES;
 
-    // J1     J2     out(V)   out (val)
-    // out    out    0.0        0
-    // out     in    1.7       87
-    //  in    out    2.5      127
-    //  in     in    3.0      153
+    //             measured
+    // J1     J2     out     threshold
+    // ===============================
+    // out    out     77
+    //                   ----- 95
+    // out     in    112
+    //                   ----- 120
+    //  in    out    129
+    //                   ----- 140
+    //  in     in    150
     //
     // therefore threshold values to split 
-    //   into 4 buckets are:  43, 107, 140
+    //   into 4 buckets are:  95, 120, 140
+    //
+    // NOTE: IF THE STC PROGRAMMER IS CONNECTED, THE ADC READ WILL
+    //  ALWAYS BE HIGH, AND BOTH JUMPERS WILL APPEAR TO BE IN.
     
     jumperJ1_IN = false;
     jumperJ2_IN = false;
-    if (jumperADC > 107) {
+    if (jumperADC > 120) {
         jumperJ1_IN = true;
         if (jumperADC > 140) {
             jumperJ2_IN = true;
         }
     } else {
         // we know that J1 is OUT
-        if (jumperADC > 43) {
+        if (jumperADC > 95) {
             jumperJ2_IN = true;
         }
     }
@@ -116,8 +124,12 @@ void showFirmwareVersion() {
     //  to indicate which version we are running...
     // Right now, we're NOT going to flash for firmwareMajorVersion (that's
     //   for future expansion)
-    SYS_Delay(400); // wait 1/2 sec (in total) for everything to settle
-    for (uint8_t i = 0; i < firmwareMinorVersion; i++) {
+    TURN_LED_OFF()
+    SYS_Delay(500); // wait 1/2 sec (in total) for everything to settle
+
+    // NOTE: one extra flash for reversed RVC -------
+    uint8_t numFlashesAtPowerup = firmwareMinorVersion + (jumperJ1_IN ? 0 : 1); // IN/NORM = 2, OUT/REV = 3 flashes
+    for (uint8_t i = 0; i < numFlashesAtPowerup; i++) {
         // blink
         SYS_Delay(100);
         TURN_LED_ON()
@@ -212,14 +224,14 @@ inline void serviceBatteryMonitorAndLED() {
         LEDCounter = 0;
     }
 
-// #ifdef DEBUG_OUTPUT
-//     // PRINT IT -----
-//     // UART1_TxString("ADC=0x");
-//     // UART1_TxHex(result & 0xFF);
-//     UART1_TxHex(jumperADC & 0xFF); // print out the jumper value
-//     // UART1_TxString("\r\n");
-//     UART1_TxString(",");
-// #endif
+#ifdef DEBUG_OUTPUT
+    // PRINT IT -----
+    // UART1_TxString("ADC=0x");
+    // UART1_TxHex(result & 0xFF);
+    UART1_TxHex(jumperADC & 0xFF); // print out the jumper value
+    // UART1_TxString("\r\n");
+    UART1_TxString(",");
+#endif
 }
 
 // ==========================================================
@@ -369,11 +381,11 @@ void initRemoteVolumeControl() {
     ADC_SetResultAlignmentLeft();   // Left alignment, high 8-bit in ADC_RES
     ADC_SetPowerState(HAL_State_ON); // Turn on ADC power
 
-    setAttenuation(0); // initially ZERO attenuation
+    setAttenuation(15); // low output until AFTER the firmware version flashes, then RVC-specified output
 }
 
 // --------------------------------------------------------
-void serviceRemoteVolumeControl() {
+void serviceRemoteVolumeControl(bool force) {
 #define ATTEN_STEP_DELAY_US 50
     
     ADC_SetChannel(0x03);           // RVC channel = ADC3
@@ -386,17 +398,17 @@ void serviceRemoteVolumeControl() {
     ADC_ClearInterrupt();
     uint8_t RVCval = ADC_RES;
 
-#ifdef DEBUG_OUTPUT
-    // PRINT IT -----
-    UART1_TxHex(RVCval); // print out the remote volume control value
-    UART1_TxString(",");
-#endif    
+// #ifdef DEBUG_OUTPUT
+//     // PRINT IT -----
+//     UART1_TxHex(RVCval); // print out the remote volume control value
+//     UART1_TxString(",");
+// #endif    
 
     // At this point, we know what the remote volume control is set to.
     // "RVCval" at this point will be:
     //
     //    open (no RVOL) = 0xFF
-    //    full CCW = 0xD3
+    //    full CCW = 0xD3 <-- NOTE: this is wrong now, should be about 133 now
     //    full CW  = 0x00
     //
     // Most right-handed users will turn the pot CW to increase volume.
@@ -433,15 +445,15 @@ void serviceRemoteVolumeControl() {
             linearPotVal = 255; // cap this, just in case
         }
 
-        if (jumperJ1_IN) {
-            // ***** J1 IN = LEFT-HANDED or "REVERSED" VOL CTRL DIRECTION
-        } else {
-            // ***** J1 OUT = RIGHT-HANDED or "NORMAL" VOL CTRL DIRECTION
-            linearPotVal = 255 - linearPotVal; // 255 - 0
-        }
-
 // NO SLEEPY RANGE: 0 - 133
 
+// -----------------------
+// PICK EXACTLY ONE:
+//#define CURRENTALGORITHM
+#define NEWALGORITHM
+// -----------------------
+
+#ifdef CURRENTALGORITHM
     uint16_t q1 = linearPotVal/3;
     if (q1 >= 80) {
         // don't allow attenuations of less than 0
@@ -456,93 +468,72 @@ void serviceRemoteVolumeControl() {
 
     // RESULTING ATTENUATION = res, range: 0 - 64
 
-// // RANGE: 0 - 255
-// #define LOWVAL 4
-// #define DIVIDER 4
-// // #define HIGHVAL (LOWVAL + DIVIDER * 64)
-// #define HIGHVAL 251
-
-//         if (linearPotVal < LOWVAL) {
-//             // lowest ~6% on the pot
-//             res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
-//         } else if (linearPotVal > HIGHVAL) {
-//             // highest ~5% on the pot
-//             res = 0;   // MAX VOL (0dB attenuation)
-//         } else {
-//             // linearPotVal range now 61 to 959 = 898 steps = ~64*14
-//             // (linearPotVal - 61) = 0 to 898
-//             // (linearPotVal - 61)/14 = 0 to 64
-//             // 64 - (linearPotVal - 61)/14 = 64 to 0
-//             res = 64 - (linearPotVal - LOWVAL)/DIVIDER; // 64dB to 0dB
-//             // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
-//         }
-
-        // // OLD CODE -------
-        // if (RVCval < 15) {
-        //     res = 64; // MUTE (96dB attenuation); NOTE: do not use 255 here, because we must step the attenuation
-        // } else if (RVCval >= 0xD0) {
-        //     // max ADC is 0xD3 = 211
-        //     // guard band is 0xD0 = 208
-        //     res = 0;   // MAX VOL (0dB attenuation)
-        // } else {
-        //     // RVCval range now 15 to 207 = 192 steps = ~64*3
-        //     // (RVCval - 15) = 0 to 192
-        //     // (RVCval - 15)/3 = 0 to 64
-        //     // 64 - (RVCval - 15)/3 = 64 to 0
-        //     res = 64 - (RVCval - 15)/3; // 64dB to 0dB
-        //     // NOTE: this divide should be fast, because STC8G1K08A has MCU16 HW divider
-        // }
-    }
-
-// #ifdef DEBUG_OUTPUT
-//     // PRINT DETECTED JUMPER VALUES -----
-//     UART1_TxString("\nJUMPER ADC: ");
-//     UART1_TxHex(jumperADC & 0xFF);
-//     UART1_TxString(", JUMPER J1: ");
-//     if (jumperJ1_IN) {
-//         UART1_TxString("IN");
-//     } else {
-//         UART1_TxString("OUT");
-//     }
-//     UART1_TxString(", JUMPER J2: ");
-//     if (jumperJ2_IN) {
-//         UART1_TxString("IN");
-//     } else {
-//         UART1_TxString("OUT");
-//     }
-//     UART1_TxString("\n");
-// #endif
-
-#ifdef DEBUG_OUTPUT
-    // PRINT IT -----
-    UART1_TxHex(res & 0xFF); // print out the attenuation in dB
-    UART1_TxString("\n");
 #endif
 
-    // step it up or down in increments of 1 dB to avoid zipper effect
-    if (previousRes < res) {
-        // step UP to get to correct level of attenuation
-        for (uint8_t a = previousRes+1; a < res; a++) {
-            setAttenuation(a);
-#if ATTEN_STEP_DELAY_US > 0
-            SYS_DelayUs(ATTEN_STEP_DELAY_US);
-#endif            
+#ifdef NEWALGORITHM
+        /* ******************** NEW ALGORITHM ******************** */
+        // ***** J1 IN = LEFT-HANDED or "REVERSED" VOL CTRL DIRECTION
+        uint8_t A = 3*64; // turn pot 3/4 of the way
+        uint8_t B = 14;   //  to attenuate by 12dB @ knee of the curve
+        uint8_t C = 48;   // then drop to mute
+        uint8_t D = 236;  //  at the end of the pot travel (guard band)
+        uint8_t E = 6;      //  at the beginning of the pot travel (guard band)
+
+        if (!jumperJ1_IN) {
+            // ***** J1 OUT = RIGHT-HANDED or "NORMAL" VOL CTRL DIRECTION
+            // A = 3*64;  // these are the same for both cases, so commented them out
+            // B = 14;
+            // C = 48;
+            // D = 236;
+            E = 11;
+            linearPotVal = 255 - linearPotVal; // 255 - 0
         }
-        setAttenuation(res);
-    } else if (res < previousRes) {
-        // step DOWN to get to correct level of attenuation
-        for (uint8_t a = previousRes-1; a > res; a--) {
-            setAttenuation(a);
-#if ATTEN_STEP_DELAY_US > 0
-            SYS_DelayUs(ATTEN_STEP_DELAY_US);
-#endif            
+
+        // the newest algorithm -----------------
+        if (linearPotVal < E) {
+            res = 0; // result = no attenuation
+        } else if (linearPotVal > D) {
+            res = 64; // attenuation = MAX
+        } else if (linearPotVal <= A) {
+            // intermediate result = uint16, attenuation is positive
+            res = ((linearPotVal - E) * B)/A;
+        } else { // x > A
+            // intermediate result = uint16, attenuation is positive
+            res = B + ((uint16_t)(linearPotVal-A) * (uint8_t)(C-B))/(uint8_t)(D-A);
         }
-        setAttenuation(res);
-    } else { 
-        // else do nothing if old and new attenuation values are equal
-        // setAttenuation(res);  // DEBUG DEBUG DEBUG
+        /* ******************** END NEW ALGORITHM ******************** */
+#endif
+
+    } // end else
+
+    if (force) {
+        setAttenuation(res); // one time force
+    } else {
+        // step it up or down in increments of 1 dB to avoid zipper effect
+        if (previousRes < res) {
+            // step UP to get to correct level of attenuation
+            for (uint8_t a = previousRes+1; a < res; a++) {
+                setAttenuation(a);
+    #if ATTEN_STEP_DELAY_US > 0
+                SYS_DelayUs(ATTEN_STEP_DELAY_US);
+    #endif            
+            }
+            setAttenuation(res);
+        } else if (res < previousRes) {
+            // step DOWN to get to correct level of attenuation
+            for (uint8_t a = previousRes-1; a > res; a--) {
+                setAttenuation(a);
+    #if ATTEN_STEP_DELAY_US > 0
+                SYS_DelayUs(ATTEN_STEP_DELAY_US);
+    #endif            
+            }
+            setAttenuation(res);
+        } else { 
+            // else do nothing if old and new attenuation values are equal
+            // setAttenuation(res);  // DEBUG DEBUG DEBUG
+        }
     }
-    previousRes = res; // remember where we are now
+    previousRes = res; // remember where we are now (regardless of force or not)
 }
 
 // ==========================================================
@@ -551,7 +542,7 @@ void serviceRemoteVolumeControl() {
 void initUART() {
     // UART1_Config8bitUart(UART1_BaudSource_Timer1, HAL_State_ON, 115200); // 115200/8/N/1
     // UART1_Config8bitUart(UART1_BaudSource_Timer1, HAL_State_ON, 115200); // 115200/8/N/1
-    UART1_Config8bitUart(UART1_BaudSource_Timer1, HAL_State_ON, 160911); // =115200/8/N/1  FIX FIX FIX: slow MCU clock
+    UART1_Config8bitUart(UART1_BaudSource_Timer1, HAL_State_ON, 174563); // =115200/8/N/1  FIX FIX FIX: slow MCU clock
 }
 #endif
 
@@ -593,7 +584,7 @@ inline void sleepUntilTimeToWakeup() {
 
     enterPowerDownMode();
 #else        
-    SYS_Delay(50); // 20X/sec
+    SYS_Delay(25); // 40X/sec
 #endif        
 }
 
@@ -605,16 +596,18 @@ void main()
     SYS_SetClock();  // Set system clock. Removed because system clock is already set by STC-ISP X86
 
     initJumperRead();  // read the jumper value J1/J2 (analog value)
-    initRemoteVolumeControl();    
+    initRemoteVolumeControl();
     initBatteryMonitorAndLED();
     initSleepControl();
 
     // before we get going, service these once
-    serviceRemoteVolumeControl();  // service once to set volume
     serviceBatteryMonitorAndLED(); // service once to set LED
 
     // this takes a while...
     showFirmwareVersion();
+
+    // after running at 12dB for a second, now go to RVC volume
+    serviceRemoteVolumeControl(true);  // service once to force init volume as per RVC
 
 #ifdef DEBUG_OUTPUT
     initUART();
@@ -634,7 +627,7 @@ void main()
             serviceBatteryMonitorAndLED();
         }
 
-        serviceRemoteVolumeControl();  // service this one 20X/sec, so no lag
+        serviceRemoteVolumeControl(false);  // service this one 20X/sec, so no lag
 
         // BACK TO SLEEP...
         sleepUntilTimeToWakeup();  // 20X/sec
