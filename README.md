@@ -1,9 +1,9 @@
 # ladybug-mixer
 Second generation, portable, low-cost audio mixer for square dance callers and round dance cuers
 
-**First generation LB-102 enclosure (powder-coated, laser-engraved lettering)**:
+**First pics of the LB-202 enclosure (powder-coated, laser-engraved lettering), and inside components**:
 
-<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/main/pics/V3_All.jpeg" width="500">
+<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/refs/heads/main/LB-202/graphics/LB202.jpg" width="500">
 
 <img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/refs/heads/main/pics/LB202_inside.jpeg" width="500">
 
