@@ -13,7 +13,7 @@ Second generation, portable, low-cost audio mixer for square dance callers and r
 
 # Description
 
-The Ladybug LB-202 Mixer is an inexpensive ($100 parts cost) compact audio mixer, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone like a [Sennheiser e845 and cable, $100](https://www.amazon.com/Sennheiser-Cardioid-Handheld-Dynamic-Microphone/dp/B07CVK32VV), a [standard XLR mic cable for low-noise output, $10](https://www.amazon.com/dp/B01JNLTTKS), and a powered speaker like an [Alto TS-408, 2000W peak, $250](https://www.amazon.com/Alto-Professional-TS408-Bluetooth-Loudspeaker/dp/B0BB15J4TZ), a caller can provide high-quality sound for 8-10 squares for less than $450.  
+The Ladybug LB-202 Mixer is an inexpensive ($100 parts cost) compact audio mixer, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone like a [Sennheiser e845 and cable, $100](https://www.amazon.com/Sennheiser-Cardioid-Handheld-Dynamic-Microphone/dp/B07CVK32VV), a [standard XLR mic cable for low-noise output, $10](https://www.amazon.com/dp/B01JNLTTKS), and a powered speaker like an [Alto TS-408, 2000W peak, $250](https://www.amazon.com/Alto-Professional-TS408-Bluetooth-Loudspeaker/dp/B0BB15J4TZ), a caller can provide high-quality sound for 8-10 squares for about $450.
 
 #### Compatibility with Hilton™-compatible mic cables
 For compatibility with existing Hilton™-compatible microphone cables, the Ladybug Mixer provides two features:
@@ -41,25 +41,39 @@ The entire Ladybug Mixer design is available under an Open Source License, allow
 
 > NOTE: The Ladybug LB-202 is a "mixer", and not a "mixer/amplifier".  A Hilton™ MA-220 is both a mixer and an amplifier, so it is able to send 220W of power to UN-powered speakers.  The Ladybug mixer is designed to send a "line-level" signal to speakers that are "powered", that is, the speaker has an amplifier built-in.  There are many popular "powered speakers" available nowadays, like the [Kustom PA-50](https://www.musiciansfriend.com/pro-audio/kustom-pa-pa50-personal-pa-system) (50 watts peak), the [Alto TS-408](https://www.sweetwater.com/store/detail/TS408--alto-ts408-2000-watt-8-inch-powered-speaker) (2000 watts peak), the [Bose L1 column speaker](https://www.bestbuy.com/site/bose-l1-pro8-portable-line-array-system-black) (300 watts peak), and many others.
 
-The Version 4 mixer (shown above) uses a high-quality aluminum case (powder-coated in gloss red, and engraved with a 20W fiber laser), with an aluminum base, and black 3D-printed side and bottom panels.
+The LB-202 mixer (shown above) uses a high-quality aluminum case (powder-coated in gloss red, and engraved with a 20W fiber laser), with an aluminum base panel, and black 3D-printed side and bottom panels.
+
+#### Differences from the First-generation LB-102 Mixer
+|   |  LB-102 |  LB-202 |
+|---|:-:|:-:|
+|  Music 1 vs 2 switch |  ✅ |  ❌ |
+|  Music L/R Balance controls |  ❌ |  ✅ for cuers and split tracks |
+|  LED |  white |  RGB |
+|          - VU Meter capability          |                ❌                |                    ✅                    |
+|  Mic tone controls |  12 o'clock position = FLAT EQ |  12 o'clock position matches MA-220 EQ (bass cut + treble boost) |
+|          Feature control          |                2 internal jumpers                |                    2 user-accessible switches                    |
+|                  Bottom panel                 |                        Black PLA                        |                                5052 Aluminum                                |
+|                        Firmware flash                       |                             Internal 0.1" pin header                            |                                       Internal JST-SH connector                                      |
+|                               Future experimental features                              |                                      ❌                                     |                                                   I2C via internal Stemma-QT connector                                                   |
 
 # Specs
 - 2 Music Inputs (1/8” stereo inputs), with a slide switch to select one or the other
 - 2 Combo Mic Inputs (Lo-Z XLR or Hi-Z [Hilton™-compatible](https://www.hiltonaudio.com/store/c3/Microphone_Cables.html) 1/4“ plug) 
 - Remote Volume Control Input (20KΩ [Hilton™-compatible](https://www.hiltonaudio.com/store/c3/Microphone_Cables.html) 1/8” plug)
-- Low-noise Balanced Output (XLR, +/- 5 volt differential swing at max volume)
+- Low-noise Balanced Output to powered speaker (XLR, +/- 5 volt differential swing at max volume)
 - Separate Music (L) and Voice (R) out (1/8” stereo jack, +/- 2.5 volts peak-to-peak)
-	- Use Music-only for a monitor speaker, or use Voice-only for hearing assist
-- Uses a single 9V battery
+	- can use Music-only to a monitor speaker
+    - can use Voice-only for hearing assist
+- Uses a single 9V battery (no power supply to carry around, doesn't need a nearby power outlet)
 	- Amazon Basics Alkaline ($1.50 ea. @ AMZN): about 90 hours
 	- Tenergy Lithium ($7.00 ea. @ AMZN): about 150 hours
 	- USB-rechargeable Lithium ($7.50 ea. @ AMZN): about 50 hours per charge
-- RGB LED indicating power ON, battery level (pulses RED when low), and audio output level (VU Meter)
+- RGB LED indicating power ON, battery level (pulses RED when low), and/or audio output level (VU Meter)
 - Low noise: -80dBfs
 - Wide 3dB Bandwidth: Music 20Hz-20KHz, Voice 50Hz-20KHz
 - Small size: about 6.2”W x 2.75”H x 3.8”D (157 x 70 x 97 mm)
 - Light weight (with Alkaline battery): about 12.5oz (355g)
-- Open Source Hardware, Software, and Mechanical Design (industry-standard open source licenses)
+- Open Source Hardware, Software, and Mechanical Design (industry-standard open source licenses) = _anybody_ can build, customize, or service devices
 
 # Files available under Open Source licenses
 - SCH = schematic
