@@ -18,8 +18,11 @@ The Ladybug LB-202 Mixer is an inexpensive ($100 parts cost) compact audio mixer
 #### Compatibility with Hilton™-compatible mic cables
 For compatibility with existing Hilton™-compatible microphone cables, the Ladybug Mixer provides two features:
 
-1. Two "microphone combo jacks" that let you plug in a standard XLR cable (allows for a longer mic cable and best noise suppression, with no "dongle" required) OR a Hilton™-compatible 1/4" plug.
-2. A 1/8" (3.5mm) jack for remote volume control (RVC).  The Ladybug RVC provides two volume-control curves:  1) a "traditional" curve that matches the volume curve you get with a Hilton™ MA-220, or 2) a "Ladybug" curve that allows you to bring the volume all the way down to zero (MUTE).  Which curve is in use is selected by using a SIM card tool to press an internal mode-switch button.
+1. Two "microphone combo jacks" that let you plug in a Hilton™-compatible 1/4" plug, OR a standard XLR cable (allows for a longer mic cable and best noise suppression, with no "dongle" required).
+2. A 1/8" (3.5mm) jack for remote volume control (RVC).  The Ladybug RVC provides two volume-control curves:
+    - a "Traditional" curve that matches the volume curve you get with a Hilton™ MA-220, or
+    - a "Ladybug" curve that allows you to bring the volume all the way down to zero (MUTE).
+   Which curve is in use is selected by using a SIM card tool to press an internal mode-switch button.
 
 #### RGB LED modes
 The Ladybug LB-202 also provides several LED modes (selectable by using a SIM card tool to press an internal button) for use with the built-in RGB LED:
