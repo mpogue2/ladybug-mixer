@@ -5,11 +5,7 @@ Second generation, portable, low-cost audio mixer for square dance callers and r
 
 <img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/main/pics/V3_All.jpeg" width="500">
 
-<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/main/pics/V3_Top.jpeg" width="500">
-<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/main/pics/V3_Front.jpeg" width="500">
-<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/main/pics/V3_Back.jpeg" width="500">
-
-<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/refs/heads/main/pics/Inside_PCB_V2.4.jpeg" width="500">
+<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/refs/heads/main/pics/LB202_inside.jpeg" width="500">
 
 # Description
 
