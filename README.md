@@ -24,7 +24,7 @@ For compatibility with existing Hilton™-compatible microphone cables, the Lady
     - a "Ladybug" curve that allows you to bring the volume all the way down to zero (MUTE).
    Which curve is in use is selected by using a SIM card tool to press an internal mode-switch button.
    
-    ![Volume curves](https://raw.githubusercontent.com/mpogue2/ladybug-mixer/refs/heads/main/LB-202/graphics/rvc_curves.png){width=75%}
+<img src="https://raw.githubusercontent.com/mpogue2/ladybug-mixer/refs/heads/main/LB-202/graphics/rvc_curves.png" width="500" />
 
 #### RGB LED modes
 The Ladybug LB-202 also provides several LED modes (selectable by using a SIM card tool to press an internal button) for use with the built-in RGB LED:
