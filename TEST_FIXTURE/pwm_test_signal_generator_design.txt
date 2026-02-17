@@ -1,0 +1,111 @@
+PWM Test Signal Generator Design Discussion
+============================================
+Date: February 16, 2026
+Project: Ladybug Mixer Test Fixture
+
+OVERVIEW
+--------
+Design of a PWM-based test signal generator using an STC8G1 MCU (24MHz)
+to produce test tones for the Ladybug audio mixer's mic and music inputs.
+
+MCU: STC8G1 @ 24MHz
+PWM: 10-bit (1024 counts) → 23.4kHz PWM frequency
+Signal: 1kHz sine tone
+
+================================================================================
+MIC OUTPUT SIDE
+================================================================================
+
+Target: ~2mV differential balanced output @ 1kHz
+
+Circuit: PWM → 2-stage RC LPF → unbalanced-to-balanced voltage divider → XLR
+
+Components:
+  - R136: 10kΩ (filter stage 1)
+  - C100: 22nF (filter stage 1)
+  - R137: 10kΩ (filter stage 2)
+  - C101: 22nF (filter stage 2)
+  - R160: 10kΩ (divider, hot leg) — use 1% matched with R161
+  - R163: 100Ω (divider, center)
+  - R161: 10kΩ (divider, cold leg) — use 1% matched with R160
+  - C76: 1µF (coupling cap, hot)
+  - C77: 1µF (coupling cap, cold)
+  - U15: NC3MAH XLR connector
+
+Filter characteristics:
+  - fc ≈ 720Hz per stage
+  - Stage 1 attenuation at 1kHz: -4.7dB (×0.58)
+  - Stage 2 attenuation at 1kHz (with 20.1kΩ divider load): -6dB (×0.49)
+  - Divider ratio: 1/201 (-46dB, ×0.005)
+  - Net attenuation: ×0.0014
+  - At 56% duty cycle swing → 2mV differential output
+  - PWM ripple at 23.4kHz: ~23µV differential (~1% of signal)
+
+Notes:
+  - Output impedance ~10kΩ per leg
+  - Ladybug balanced mic input impedance ~2.8kΩ
+  - Some signal loss to load expected; calibrate actual level with meter
+  - Balance won't be perfect due to impedance mismatch, acceptable for functional testing
+  - Not suitable for CMRR testing
+
+================================================================================
+MUSIC OUTPUT SIDE
+================================================================================
+
+Target: ~1-2V p-p unbalanced output @ 1kHz
+
+Circuit: PWM → 2-stage RC LPF → coupling cap → output
+
+Components:
+  - Filter resistors: 10kΩ each stage
+  - Filter caps: 22nF each stage
+  - Coupling cap: 1µF series
+
+Filter characteristics:
+  - fc ≈ 720Hz per stage
+  - At 1kHz: ~-6dB total (two stages)
+  - ~2.5V available at full swing
+  - Ladybug music input impedance ~70kΩ (minimal loading)
+
+================================================================================
+LADYBUG INPUT CIRCUITS (for reference)
+================================================================================
+
+Balanced Mic Input (TLV6741 difference amplifier):
+  - Input resistors: R1+R3 = 160+160 = 320Ω per leg
+  - Feedback resistors: R5 = R6 = 2.2kΩ
+  - Gain: 2.2k/320 = 6.875 (+17dB)
+  - Inverting leg impedance: ~320Ω
+  - Non-inverting leg impedance: ~2.5kΩ
+  - Differential input impedance: ~2.8kΩ
+
+Music/RVC Input (MCP6002 buffer):
+  - R34 (1kΩ) + R37 (22kΩ) + R39 (47kΩ) ≈ 70kΩ at audio
+
+================================================================================
+PWM RESOLUTION NOTES
+================================================================================
+
+STC8G1 PWM options (at 24MHz):
+  - 6-bit:  64 counts,  375 kHz    — too few steps
+  - 7-bit:  128 counts, 187.5 kHz  — poor resolution
+  - 8-bit:  256 counts, 93.75 kHz  — usable
+  - 10-bit: 1024 counts, 23.4 kHz  — chosen (good resolution)
+
+At 10-bit:
+  - ~82 usable duty cycle steps in ±4% range
+  - ~23 samples per 1kHz sine cycle
+  - Effective sine resolution: ~6.4 bits
+  - THD after filtering: well under 1%
+
+================================================================================
+KEY DESIGN DECISIONS
+================================================================================
+
+1. 10-bit PWM chosen over 8-bit for better sine quality (82 vs 20 steps)
+2. 22nF caps (not 220nF) to avoid excessive attenuation at 1kHz
+3. 10kΩ/100Ω/10kΩ divider chosen as compromise between:
+   - 100kΩ/1kΩ/100kΩ (too high output impedance for Ladybug input)
+   - 1kΩ/10Ω/1kΩ (too much filter loading)
+4. Same filter resistors (10kΩ) and caps (22nF) for both mic and music sides
+5. Music side needs no voltage divider — just duty cycle adjustment
