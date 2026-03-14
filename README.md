@@ -9,7 +9,7 @@ Second generation, portable, low-cost audio mixer for square dance callers and r
 
 # Description
 
-The Ladybug LB-202 Mixer is an inexpensive ($150 assembled) compact audio mixer, focused on the needs of beginning and intermediate square dance callers. With the addition of a dynamic microphone like a [Sennheiser e845 and cable, $100](https://www.amazon.com/Sennheiser-Cardioid-Handheld-Dynamic-Microphone/dp/B07CVK32VV), a [standard XLR mic cable for low-noise output, $10](https://www.amazon.com/dp/B01JNLTTKS), and a powered speaker like an [Alto TS-408, 2000W peak, $250](https://www.amazon.com/Alto-Professional-TS408-Bluetooth-Loudspeaker/dp/B0BB15J4TZ), a caller can provide high-quality sound for 8-10 squares for about $500.
+The Ladybug LB-202 Mixer is an inexpensive ($150 assembled) compact audio mixer, focused on the needs of beginning and intermediate square dance callers. With the addition of a high-quality dynamic microphone like a [Sennheiser e845 and cable, $100](https://www.amazon.com/Sennheiser-Cardioid-Handheld-Dynamic-Microphone/dp/B07CVK32VV), a [standard XLR mic cable for low-noise output, $10](https://www.amazon.com/dp/B01JNLTTKS), and a powered speaker like an [Alto TS-408, 2000W peak, $275](https://www.amazon.com/Alto-Professional-TS408-Bluetooth-Loudspeaker/dp/B0BB15J4TZ), a caller can provide high-quality sound for 8-10 squares for about $525.  If you have a small-to-medium-sized hall, the [Alto TX-408, 350W peak, $150](https://www.amazon.com/ALTO-Bluetooth-2-Channel-Musicians-Rehearsals/dp/B0DJT7DRHF) also works quite well, and is even less expensive.  These speakers are also chainable, using standard XLR cables, for sounding halls of just about any shape and size.
 
 #### Compatibility with Hilton™-compatible mic cables
 For compatibility with existing Hilton™-compatible microphone cables, the Ladybug Mixer provides two features:
@@ -30,7 +30,7 @@ The Ladybug LB-202 also provides several LED modes (selectable by using a SIM ca
 3. Solid colors (RED, GREEN, BLUE, or WHITE)
 
 #### Long Battery Life
-A single 9-volt alkaline battery provides power for months of dances, and the Ladybug Mixer’s compact size makes it easy to carry. An off-the-shelf 9V alkaline battery ($1.50 from Amazon) will power the Ladybug mixer for about 90 hours (that's a lot of dances!), while a 9V lithium battery ($6.50 from Amazon) will probably last about 150 hours.
+A single 9-volt alkaline battery provides power for lots of dances, and the Ladybug Mixer’s compact size makes it easy to carry. An off-the-shelf 9V alkaline battery ($1.50 from Amazon) will power the Ladybug mixer for about 90 hours (that's a lot of dances!), while a 9V lithium battery ($6.50 from Amazon) will probably last about 150 hours.
 
 #### Open Source Design
 The entire Ladybug Mixer design is available under an Open Source License, allowing anybody to modify the design to fit their specific needs. If anybody wants to build these commercially, they can do so, AS LONG AS any modifications they make are passed back to the community under the same licenses.  ***Let the creativity begin!***
